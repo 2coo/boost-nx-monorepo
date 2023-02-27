@@ -1,10 +1,10 @@
-import { render } from '@testing-library/react';
+import { render } from '@testing-library/react'
 
-import SharedUi from './shared-ui';
+import { PageHeader } from './shared-ui'
 
-describe('SharedUi', () => {
+describe('PageHeader', () => {
   it('should render successfully', () => {
-    const { baseElement } = render(<SharedUi />);
-    expect(baseElement).toBeTruthy();
-  });
-});
+    const { baseElement } = render(<PageHeader />)
+    expect(baseElement).toBeTruthy()
+  })
+})
