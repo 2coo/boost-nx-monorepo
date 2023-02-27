@@ -2,7 +2,14 @@
   "name": "boost",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start": "nx serve",
+    "build": "nx run-many --target=build all parallel",
+    "test": "nx run-many --target=test all parallel",
+    "lint": "nx run-many --target=lint all parallel",
+    "e2e": "nx run-many --target=e2e",
+    "prepare": "husky install"
+  },
   "private": true,
   "dependencies": {
     "@nrwl/next": "15.7.2",
@@ -40,9 +47,11 @@
     "eslint-plugin-jsx-a11y": "6.6.1",
     "eslint-plugin-react": "7.31.11",
     "eslint-plugin-react-hooks": "4.6.0",
+    "husky": "^8.0.0",
     "jest": "28.1.1",
     "jest-environment-jsdom": "28.1.1",
     "jsdom": "~20.0.3",
+    "lint-staged": "^13.1.2",
     "nx": "15.7.2",
     "prettier": "^2.6.2",
     "react-test-renderer": "18.2.0",
