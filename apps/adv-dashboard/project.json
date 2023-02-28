@@ -63,6 +63,20 @@
       "options": {
         "lintFilePatterns": ["apps/adv-dashboard/**/*.{ts,tsx,js,jsx}"]
       }
+    },
+    "tsc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "yarn tsc -p apps/adv-dashboard/tsconfig.json --noEmit --incremental false"
+      }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["chmod +x deploy.sh", "./deploy.sh"],
+        "cwd": "apps/adv-dashboard",
+        "parallel": false
+      }
     }
   },
   "tags": []

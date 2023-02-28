@@ -1,0 +1,60 @@
+name: Setup Cache
+
+description: Cache required paths
+
+inputs:
+  NODE_VERSION:
+    description: Node version to use
+    required: true
+  ADDITIONAL_PATHS:
+    description: Additional paths to add to cache based on yarn.lock
+    required: false
+
+runs:
+  using: composite
+
+  steps:
+    # We use a separate cache step instead of the one included in setup-node as
+    # setup-node only caches the npm directory and requires us to install the
+    # dependencies instead of simply decompressing the node_modules folder. This
+    # approach takes 1/4 the time in the case of the webview compared to using
+    # setup-node caching and does not require an additional install step.
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Cache node modules
+      id: cache-node-modules
+      uses: actions/cache@v3
+      env:
+        cache-name: v1-cache-node-modules
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+
+    - name: Cache others
+      id: cache-others
+      uses: actions/cache@v3
+      if: ${{ inputs.ADDITIONAL_PATHS != '' }}
+      env:
+        cache-name: v1-cache-others
+      with:
+        path: ${{ inputs.ADDITIONAL_PATHS }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('yarn.lock') }}
+
+    - name: Use node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version-file: ${{ inputs.NODE_VERSION }}
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        if [[ '${{ steps.cache-node-modules.outputs.cache-hit }}' != 'true' ]]
+        then
+          yarn install --frozen-lockfile
+        elif [[ '${{ inputs.ADDITIONAL_PATHS }}' != '' && '${{ steps.cache-others.outputs.cache-hit }}' != 'true' ]]
+        then
+          yarn install --frozen-lockfile
+        else
+          echo "Cache hit, no need to install dependencies"
+        fi

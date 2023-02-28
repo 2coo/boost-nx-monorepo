@@ -19,3 +19,13 @@ Run `npx nx connect-to-nx-cloud` to enable [remote caching](https://nx.app) and 
 ## Further help
 
 Visit the [Nx Documentation](https://nx.dev) to learn more.
+
+## Before deployment
+
+Check dependency-graph
+
+Run `nx affected:dep-graph`
+
+Prints the projects property from the print-affected output:
+
+Run `nx print-affected --type=app --select=projects`

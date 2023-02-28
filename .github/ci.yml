@@ -1,0 +1,135 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  merge_group:
+
+jobs:
+  cache-node-modules:
+    name: Install & Cache node modules
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup node and cache node_modules
+        uses: ./.github/workflows/setup-cache
+        with:
+          NODE_VERSION: .node-version
+          ADDITIONAL_PATHS: ~./cache/Cypress
+
+  lint:
+    name: Lint
+    needs: cache-node-modules
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup node and cache node_modules
+        uses: ./.github/workflows/setup-cache
+        with:
+          NODE_VERSION: .node-version
+
+      - name: Lint
+        run: yarn affected:lint
+
+  compile:
+    name: Compile Typescript
+    needs: cache-node-modules
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup node and cache node_modules
+        uses: ./.github/workflows/setup-cache
+        with:
+          NODE_VERSION: .node-version
+
+      - name: Run tsc
+        run: yarn affected:tsc
+
+  #  unit:
+  #    name: Unit tests
+  #    needs: cache-node-modules
+  #    runs-on: ubuntu-latest
+  #
+  #    steps:
+  #      - name: Checkout code
+  #        uses: actions/checkout@v3
+  #
+  #      - name: Setup node and cache node_modules
+  #        uses: ./.github/workflows/setup-cache
+  #        with:
+  #          NODE_VERSION: .node-version
+  #
+  #      - name: Run tests
+  #        run: npm test -- --coverage --ci --runInBand
+  #
+  #  regression:
+  #    name: Regression tests
+  #    needs: cache-node-modules
+  #    runs-on: ubuntu-latest
+  #
+  #   steps:
+  #      - name: Checkout code
+  #        uses: actions/checkout@v3
+  #
+  #      - name: Setup node and cache node_modules
+  #        uses: ./.github/workflows/setup-cache
+  #        with:
+  #          NODE_VERSION: .node-version
+  #          ADDITIONAL_PATHS: ~/.cache/Cypress
+  #
+  #      - name: Run regression tests
+  #        run: npm run test:visual-regression
+  #
+  #  integration:
+  #    name: Integration tests
+  #    needs: cache-node-modules
+  #    runs-on: ubuntu-latest
+  #
+  #    steps:
+  #      - name: Checkout code
+  #        uses: actions/checkout@v3
+  #
+  #      - name: Setup node and cache node_modules
+  #        uses: ./.github/workflows/setup-cache
+  #        with:
+  #          NODE_VERSION: .node-version
+  #          ADDITIONAL_PATHS: ~/.cache/Cypress
+  #
+  #      - name: test:integration
+  #        uses: nick-fields/retry@v2
+  #        with:
+  #          max_attempts: 3
+  #          timeout_minutes: 5
+  #          command: yarn affected:e2e
+
+  build:
+    name: Build
+    needs: cache-node-modules
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup node and cache node_modules
+        uses: ./.github/workflows/setup-cache
+        with:
+          NODE_VERSION: .node-version
+
+      - name: Setup env
+        uses: FranzDiebold/github-env-vars-action@v2
+
+      - name: Build
+        run: |
+          WEBVIEW_VERSION=${{ env.CI_ACTION_REF_NAME_SLUG }} \
+          yarn affected:build

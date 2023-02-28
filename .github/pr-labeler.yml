@@ -1,0 +1,29 @@
+# https://github.com/marketplace/actions/pull-request-size-labeler
+
+name: PR size labeler
+
+on:
+  pull_request:
+  merge_group:
+
+jobs:
+  labeler:
+    if: ${{ github.event_name == 'pull_request' }} # only run job if workflow initiated by a pull request event
+    runs-on: ubuntu-latest
+    name: Label the PR size
+    steps:
+      - uses: LubaBuya/pr-size-labeler@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          xs_diff: '10'
+
+          s_diff: '50'
+
+          m_diff: '250'
+
+          l_diff: '500'
+
+          fail_if_xl: true
+
+          excluded_files: '(.+(test|spec|cy)\.(ts|tsx|js|jsx)|package-lock.json|yarn.lock)$'
